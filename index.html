@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Indicadores de Saúde • Relatório Personalizado</title>
   <style>
     :root{
@@ -10,7 +10,14 @@
       --border:rgba(255,255,255,.12);
       --accent:#7c3aed; --accent2:#3b82f6;
       --danger:#ef4444; --ok:#22c55e; --warn:#f59e0b;
+
+      --radius:18px;
+      --pad:18px;
+      --gap:14px;
     }
+
+    *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -20,34 +27,67 @@
         var(--bg);
       color:var(--text);
       min-height:100vh;
-      padding:24px;
+      padding: clamp(14px, 2.5vw, 24px);
       display:grid;
       place-items:start center;
+      /* reserva espaço pro float + safe area */
+      padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
     }
+
     .wrap{ width:min(980px, 100%); }
+
+    /* Título superior (responsivo) */
+    .hero-title{
+      margin: 0 0 12px;
+      font-size: clamp(18px, 2.2vw, 28px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .hero-sub{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: clamp(13px, 1.5vw, 14px);
+      line-height: 1.45;
+    }
+
     .header{
-      display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:16px;
       margin-bottom:14px;
     }
-    .title h1{ margin:0; font-size:22px; }
-    .title p{ margin:6px 0 0; color:var(--muted); }
+    .title h1{
+      margin:0;
+      font-size: clamp(18px, 2vw, 22px);
+      letter-spacing: -0.01em;
+    }
+    .title p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%), var(--card);
       border:1px solid var(--border);
-      border-radius:18px;
-      padding:18px;
+      border-radius: var(--radius);
+      padding: var(--pad);
       box-shadow:0 20px 60px rgba(0,0,0,.35);
       margin-bottom:16px;
     }
 
-    form{ display:grid; gap:14px; }
-    .grid{ display:grid; gap:14px; grid-template-columns:1fr; }
-    @media (min-width: 920px){ .grid{ grid-template-columns:1fr 1fr; } }
+    form{ display:grid; gap: var(--gap); }
+
+    .grid{ display:grid; gap: var(--gap); grid-template-columns:1fr; }
+    @media (min-width: 920px){
+      .grid{ grid-template-columns:1fr 1fr; }
+    }
 
     label{ display:grid; gap:6px; font-size:13px; color:var(--muted); }
     input, select, textarea{
-      width:100%; box-sizing:border-box;
+      width:100%;
       padding:12px;
       background:rgba(255,255,255,.03);
       color:var(--text);
@@ -55,6 +95,7 @@
       border-radius:12px;
       outline:none;
       transition:border .15s ease, box-shadow .15s ease;
+      font-size: 14px;
     }
     textarea{ min-height:100px; resize:vertical; }
     input:focus, select:focus, textarea:focus{
@@ -82,7 +123,11 @@
     .opt .d{ color:var(--muted); font-size:12px; margin-top:2px; }
 
     .row{
-      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
 
     .btn{
@@ -91,6 +136,7 @@
       background: linear-gradient(90deg, rgba(124,58,237,1), rgba(59,130,246,1));
       color:white; font-weight:800;
       cursor:pointer;
+      min-height: 44px; /* toque confortável */
     }
     .btn.secondary{
       background: rgba(255,255,255,.06);
@@ -98,7 +144,7 @@
       font-weight:650;
     }
     .btn[disabled]{ opacity:.6; cursor:not-allowed; }
-    .help{ color:var(--muted); font-size:12px; }
+    .help{ color:var(--muted); font-size:12px; line-height: 1.4; }
 
     .error{ display:none; color:var(--danger); font-size:12px; margin-top:6px; }
     .error.show{ display:block; }
@@ -109,19 +155,19 @@
       border:1px solid var(--border);
       background: rgba(255,255,255,.03);
       font-size:14px;
+      line-height: 1.4;
     }
     .status.ok{ border-color: rgba(34,197,94,.35); }
     .status.bad{ border-color: rgba(239,68,68,.35); }
 
-    .results{
-      display:none;
-      gap:14px;
-    }
+    .results{ display:none; gap:14px; }
     .cards{
       display:grid; gap:14px;
       grid-template-columns:1fr;
     }
-    @media (min-width: 920px){ .cards{ grid-template-columns:1fr 1fr 1fr; } }
+    @media (min-width: 920px){
+      .cards{ grid-template-columns:1fr 1fr 1fr; }
+    }
 
     .metric{
       padding:14px;
@@ -140,6 +186,7 @@
       background: rgba(255,255,255,.03);
       margin-top:8px;
       color: var(--text);
+      line-height: 1.2;
     }
     .badge.ok{ border-color: rgba(34,197,94,.35); }
     .badge.warn{ border-color: rgba(245,158,11,.35); }
@@ -153,7 +200,7 @@
     .section-title span{ color:var(--muted); font-size:12px; }
 
     ul{ margin:10px 0 0; padding-left:18px; color:var(--text); }
-    li{ margin:8px 0; color: var(--text); }
+    li{ margin:8px 0; color: var(--text); line-height: 1.4; }
     .muted{ color:var(--muted); }
 
     /* Honeypot */
@@ -161,6 +208,7 @@
 
     /* ====== CONTEXTO BRASIL (TOPO) ====== */
     .context { margin-bottom: 16px; }
+
     .kpis{
       display:grid; gap:12px;
       grid-template-columns:1fr;
@@ -177,19 +225,18 @@
     }
     .kpi .k{ color:var(--muted); font-size:12px; }
     .kpi .v{ font-size:18px; font-weight:850; margin-top:6px; }
-    .kpi .t{ color:var(--muted); font-size:12px; margin-top:6px; }
+    .kpi .t{ color:var(--muted); font-size:12px; margin-top:6px; line-height: 1.35; }
 
+    /* ====== TABELAS RESPONSIVAS ======
+       Desktop/tablet: tabela normal.
+       Mobile: vira "cards" por linha (sem scroll horizontal). */
     .tablewrap{
-      overflow:auto;
       border:1px solid var(--border);
       border-radius:14px;
       background: rgba(255,255,255,.02);
+      overflow:hidden;
     }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:720px;
-    }
+    table{ width:100%; border-collapse:collapse; }
     th, td{
       text-align:left;
       padding:12px;
@@ -198,7 +245,6 @@
       font-size:13px;
     }
     th{ color:var(--text); font-weight:800; }
-    td{ color:var(--text); }
     caption{
       text-align:left;
       padding:12px;
@@ -218,81 +264,96 @@
       margin:14px 0;
       border:0;
     }
-   /* ===== Float moderno (copyright) ===== */
-.floating-copyright{
-  position: fixed;
-  left: 16px;
-  bottom: 16px;
-  z-index: 9999;
 
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+    @media (max-width: 720px){
+      /* Tabela vira cards */
+      .tablewrap{ overflow: visible; }
+      table, thead, tbody, th, td, tr{ display:block; width:100%; }
+      thead{ display:none; }
+      caption{ padding-bottom: 6px; }
+      tr{
+        border-top:1px solid rgba(255,255,255,.08);
+        padding: 10px 12px;
+      }
+      tbody tr:first-child{ border-top:none; }
+      td{
+        border-bottom:none;
+        padding: 8px 0;
+        display:flex;
+        gap: 10px;
+        justify-content: space-between;
+      }
+      td::before{
+        content: attr(data-label);
+        color: var(--muted);
+        font-weight: 650;
+        padding-right: 10px;
+      }
+    }
 
-  padding: 10px 14px;
-  border-radius: 14px;
+    /* ===== Float moderno (copyright) ===== */
+    .floating-copyright{
+      position: fixed;
+      left: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      z-index: 9999;
 
-  background: linear-gradient(
-    135deg,
-    rgba(17, 24, 39, 0.72),
-    rgba(17, 24, 39, 0.45)
-  );
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(12px);
-  box-shadow:
-    0 18px 45px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
 
-  color: rgba(229,231,235,0.92);
-  font-size: 12px;
-  line-height: 1.2;
-  max-width: min(520px, calc(100vw - 32px));
-}
+      padding: 10px 14px;
+      border-radius: 14px;
 
-.floating-copyright .dot{
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 30%, rgba(124,58,237,1), rgba(59,130,246,1));
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
-  flex: 0 0 auto;
-}
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.72), rgba(17, 24, 39, 0.45));
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 
-.floating-copyright .text{
-  display: grid;
-  gap: 2px;
-}
+      color: rgba(229,231,235,0.92);
+      font-size: 12px;
+      line-height: 1.2;
+      max-width: min(520px, calc(100vw - 32px));
+    }
 
-.floating-copyright .text strong{
-  font-weight: 800;
-  color: rgba(255,255,255,0.95);
-}
+    .floating-copyright .dot{
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, rgba(124,58,237,1), rgba(59,130,246,1));
+      box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+      flex: 0 0 auto;
+    }
+    .floating-copyright .text{ display: grid; gap: 2px; }
+    .floating-copyright .text strong{
+      font-weight: 800;
+      color: rgba(255,255,255,0.95);
+    }
+    .floating-copyright .text span{ color: rgba(229,231,235,0.75); }
 
-.floating-copyright .text span{
-  color: rgba(229,231,235,0.75);
-}
-
-/* para não cobrir conteúdo no rodapé */
-body{
-  padding-bottom: 86px;
-}
-
-@media (max-width: 520px){
-  .floating-copyright{
-    left: 12px;
-    bottom: 12px;
-    padding: 10px 12px;
-    border-radius: 12px;
-  }
-}
-
-
+    /* No mobile, centraliza e deixa mais compacto */
+    @media (max-width: 520px){
+      .floating-copyright{
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        max-width: none;
+        justify-content: center;
+        border-radius: 16px;
+        padding: 10px 12px;
+        text-align: center;
+      }
+      .floating-copyright .text{
+        text-align:center;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h1>Treine por Você: Bem-Estar Começa com uma Escolha</h1>
+    <h1 class="hero-title">Treine por Você: Bem-Estar Começa com uma Escolha</h1>
+    <p class="hero-sub">Preencha o formulário e receba indicadores e recomendações personalizadas (orientação geral, não diagnóstico).</p>
 
     <!-- ===== CONTEXTO BRASIL (INÍCIO DO SITE) ===== -->
     <div class="card context" id="contexto-brasil">
@@ -340,12 +401,42 @@ body{
             </tr>
           </thead>
           <tbody>
-            <tr><td>18–24 anos</td><td>~40%</td><td>~9–10%</td><td>Crescimento acelerado nos últimos anos</td></tr>
-            <tr><td>25–34 anos</td><td>~55%</td><td>~18%</td><td>Forte aumento pós-juventude</td></tr>
-            <tr><td>35–44 anos</td><td>~63%</td><td>~25%</td><td>Consolidação do excesso de peso</td></tr>
-            <tr><td>45–54 anos</td><td>~68–70%</td><td>~30%</td><td>Pico de obesidade</td></tr>
-            <tr><td>55–64 anos</td><td>~67%</td><td>~28%</td><td>Leve estabilização</td></tr>
-            <tr><td>65+ anos</td><td>~60%</td><td>~22%</td><td>Redução relativa</td></tr>
+            <tr>
+              <td data-label="Faixa etária">18–24 anos</td>
+              <td data-label="Excesso de peso (%)">~40%</td>
+              <td data-label="Obesidade (%)">~9–10%</td>
+              <td data-label="Observação">Crescimento acelerado nos últimos anos</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">25–34 anos</td>
+              <td data-label="Excesso de peso (%)">~55%</td>
+              <td data-label="Obesidade (%)">~18%</td>
+              <td data-label="Observação">Forte aumento pós-juventude</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">35–44 anos</td>
+              <td data-label="Excesso de peso (%)">~63%</td>
+              <td data-label="Obesidade (%)">~25%</td>
+              <td data-label="Observação">Consolidação do excesso de peso</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">45–54 anos</td>
+              <td data-label="Excesso de peso (%)">~68–70%</td>
+              <td data-label="Obesidade (%)">~30%</td>
+              <td data-label="Observação">Pico de obesidade</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">55–64 anos</td>
+              <td data-label="Excesso de peso (%)">~67%</td>
+              <td data-label="Obesidade (%)">~28%</td>
+              <td data-label="Observação">Leve estabilização</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">65+ anos</td>
+              <td data-label="Excesso de peso (%)">~60%</td>
+              <td data-label="Obesidade (%)">~22%</td>
+              <td data-label="Observação">Redução relativa</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -367,11 +458,31 @@ body{
             </tr>
           </thead>
           <tbody>
-            <tr><td>Sul</td><td>~17–18%</td><td>Alta</td></tr>
-            <tr><td>Sudeste</td><td>~16–17%</td><td>Alta</td></tr>
-            <tr><td>Centro-Oeste</td><td>~15–16%</td><td>Moderada</td></tr>
-            <tr><td>Nordeste</td><td>~13–14%</td><td>Crescente</td></tr>
-            <tr><td>Norte</td><td>~11–12%</td><td>Menor, porém em alta</td></tr>
+            <tr>
+              <td data-label="Região">Sul</td>
+              <td data-label="Obesidade (%)">~17–18%</td>
+              <td data-label="Tendência">Alta</td>
+            </tr>
+            <tr>
+              <td data-label="Região">Sudeste</td>
+              <td data-label="Obesidade (%)">~16–17%</td>
+              <td data-label="Tendência">Alta</td>
+            </tr>
+            <tr>
+              <td data-label="Região">Centro-Oeste</td>
+              <td data-label="Obesidade (%)">~15–16%</td>
+              <td data-label="Tendência">Moderada</td>
+            </tr>
+            <tr>
+              <td data-label="Região">Nordeste</td>
+              <td data-label="Obesidade (%)">~13–14%</td>
+              <td data-label="Tendência">Crescente</td>
+            </tr>
+            <tr>
+              <td data-label="Região">Norte</td>
+              <td data-label="Obesidade (%)">~11–12%</td>
+              <td data-label="Tendência">Menor, porém em alta</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -392,8 +503,14 @@ body{
             </tr>
           </thead>
           <tbody>
-            <tr><td>Não atinge nível recomendado de atividade física</td><td>~47–50%</td></tr>
-            <tr><td>Sedentarismo elevado (≥6h sentados/dia)</td><td>~30%</td></tr>
+            <tr>
+              <td data-label="Indicador">Não atinge nível recomendado de atividade física</td>
+              <td data-label="Percentual">~47–50%</td>
+            </tr>
+            <tr>
+              <td data-label="Indicador">Sedentarismo elevado (≥6h sentados/dia)</td>
+              <td data-label="Percentual">~30%</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -408,10 +525,22 @@ body{
             </tr>
           </thead>
           <tbody>
-            <tr><td>Adolescentes</td><td>até ~80–84%</td></tr>
-            <tr><td>Jovens adultos (18–24)</td><td>~55–60%</td></tr>
-            <tr><td>Adultos (25–59)</td><td>~45–50%</td></tr>
-            <tr><td>Idosos (60+)</td><td>~60–65%</td></tr>
+            <tr>
+              <td data-label="Faixa etária">Adolescentes</td>
+              <td data-label="Inatividade física (%)">até ~80–84%</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">Jovens adultos (18–24)</td>
+              <td data-label="Inatividade física (%)">~55–60%</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">Adultos (25–59)</td>
+              <td data-label="Inatividade física (%)">~45–50%</td>
+            </tr>
+            <tr>
+              <td data-label="Faixa etária">Idosos (60+)</td>
+              <td data-label="Inatividade física (%)">~60–65%</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -677,7 +806,6 @@ body{
     }
 
     function omsStatus(minutesWeek, intensity){
-      // Conversão simples para "equivalente moderado"
       let equiv = minutesWeek;
       if (intensity === "Intenso") equiv = minutesWeek * 2;
       if (intensity === "Leve")   equiv = minutesWeek * 0.6;
@@ -710,9 +838,7 @@ body{
 
     // ============ RECOMENDAÇÕES ============
     function buildRecommendations(input){
-      const {
-        age, goal, weight, height, days, minsPer, intensity, limitations, notes
-      } = input;
+      const { age, goal, weight, height, days, minsPer, intensity, limitations, notes } = input;
 
       const imc = calcIMC(weight, height);
       const imcCat = imcCategory(imc);
@@ -721,18 +847,10 @@ body{
       const score = readinessScore(minWeek, intensity, limitations);
 
       const flags = [];
-      if (limitations.includes("Condição médica")) {
-        flags.push({ tone:"warn", text:"Você marcou condição médica: recomenda-se validação com profissional antes de aumentar intensidade." });
-      }
-      if (limitations.includes("Dor/lesão recente")) {
-        flags.push({ tone:"warn", text:"Você marcou dor/lesão recente: priorize baixo impacto e progressão gradual; considere fisioterapia." });
-      }
-      if (age < 16) {
-        flags.push({ tone:"warn", text:"Para menores de idade, recomenda-se orientação profissional e foco em técnica, segurança e hábitos." });
-      }
-      if (imc >= 35) {
-        flags.push({ tone:"warn", text:"IMC elevado: priorize consistência, baixo impacto e acompanhamento profissional para segurança." });
-      }
+      if (limitations.includes("Condição médica")) flags.push({ tone:"warn", text:"Você marcou condição médica: recomenda-se validação com profissional antes de aumentar intensidade." });
+      if (limitations.includes("Dor/lesão recente")) flags.push({ tone:"warn", text:"Você marcou dor/lesão recente: priorize baixo impacto e progressão gradual; considere fisioterapia." });
+      if (age < 16) flags.push({ tone:"warn", text:"Para menores de idade, recomenda-se orientação profissional e foco em técnica, segurança e hábitos." });
+      if (imc >= 35) flags.push({ tone:"warn", text:"IMC elevado: priorize consistência, baixo impacto e acompanhamento profissional para segurança." });
 
       const plan = [];
       const habits = [];
@@ -765,26 +883,17 @@ body{
       if (oms.equiv < 150) habits.push("Priorize consistência: 150 min/semana é uma boa meta inicial (progredindo aos poucos).");
       else habits.push("Mantenha a consistência e varie estímulos (cardio + força) para resultados e saúde geral.");
 
-      if (imcCat.label === "Abaixo do peso") {
-        habits.push("Se o objetivo for desempenho/saúde, foque em força e alimentação suficiente; considere avaliação nutricional.");
-      } else if (imcCat.label === "Sobrepeso" || imcCat.tone !== "ok") {
-        habits.push("Foque em déficit calórico moderado e aumento de movimento diário (passos), evitando mudanças extremas.");
-      } else {
-        habits.push("Para manutenção, foque em rotina sustentável: treino + sono + alimentação equilibrada.");
-      }
+      if (imcCat.label === "Abaixo do peso") habits.push("Se o objetivo for desempenho/saúde, foque em força e alimentação suficiente; considere avaliação nutricional.");
+      else if (imcCat.label === "Sobrepeso" || imcCat.tone !== "ok") habits.push("Foque em déficit calórico moderado e aumento de movimento diário (passos), evitando mudanças extremas.");
+      else habits.push("Para manutenção, foque em rotina sustentável: treino + sono + alimentação equilibrada.");
 
       habits.push("Sono: tente manter rotina e qualidade; recuperação influencia diretamente desempenho e aderência.");
       habits.push("Hidratação: mantenha ingestão regular ao longo do dia, especialmente em dias de treino.");
 
-      if (intensity === "Intenso" && (limitations.length > 0 || score <= 6)) {
-        habits.push("Se você faz treino intenso, garanta dias leves e técnica adequada para reduzir risco de lesão.");
-      } else if (intensity === "Leve" && goal !== "Saúde geral") {
-        habits.push("Se o objetivo for performance/resultado, considere evoluir para moderado gradualmente.");
-      }
+      if (intensity === "Intenso" && (limitations.length > 0 || score <= 6)) habits.push("Se você faz treino intenso, garanta dias leves e técnica adequada para reduzir risco de lesão.");
+      else if (intensity === "Leve" && goal !== "Saúde geral") habits.push("Se o objetivo for performance/resultado, considere evoluir para moderado gradualmente.");
 
-      if (notes && notes.trim().length > 0) {
-        habits.push("Observação: personalize ainda mais o plano conforme suas preferências e limitações descritas.");
-      }
+      if (notes && notes.trim().length > 0) habits.push("Observação: personalize ainda mais o plano conforme suas preferências e limitações descritas.");
 
       return { imc, imcCat, minWeek, oms, score, plan, habits, flags };
     }
@@ -822,7 +931,7 @@ body{
     }
 
     function renderReport(out){
-      $("imcVal").textContent = round1(out.imc).toFixed(1);
+      $("imcVal").textContent = (Math.round(out.imc * 10) / 10).toFixed(1);
       setBadge($("imcBadge"), out.imcCat.label, out.imcCat.tone);
 
       $("minsWeekVal").textContent = String(out.minWeek);
@@ -900,32 +1009,3 @@ body{
         days: Number($("days").value),
         minsPer: Number($("minsPer").value),
         intensity: getRadio("intensity"),
-        limitations: getChecks("limitations"),
-        notes: $("notes").value || ""
-      };
-
-      try {
-        const out = buildRecommendations(input);
-        renderReport(out);
-        setStatus("Relatório gerado com sucesso.", "ok");
-      } catch (err) {
-        console.error(err);
-        setStatus("Falha ao gerar relatório. Verifique os dados e tente novamente.", "bad");
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Gerar relatório";
-      }
-    });
-  </script>
-  <!-- Cole antes do </body> -->
-<div class="floating-copyright" role="contentinfo" aria-label="Direitos autorais">
-  <div class="dot" aria-hidden="true"></div>
-  <div class="text">
-    <strong>Direitos reservados</strong>
-    <span>a Felipe dos Santos Garcia e Rafael Antunes de Souza</span>
-  </div>
-</div>
-
-
-</body>
-</html>
