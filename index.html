@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Indicadores de Saúde • Relatório Personalizado</title>
+
   <style>
     :root{
       --bg:#0b0f19; --card:#111827; --text:#e5e7eb; --muted:#9ca3af;
@@ -30,15 +31,15 @@
       padding: clamp(14px, 2.5vw, 24px);
       display:grid;
       place-items:start center;
-      /* reserva espaço pro float + safe area */
-      padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+
+      /* espaço pro float + safe area iPhone */
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
     }
 
     .wrap{ width:min(980px, 100%); }
 
-    /* Título superior (responsivo) */
     .hero-title{
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       font-size: clamp(18px, 2.2vw, 28px);
       line-height: 1.15;
       letter-spacing: -0.02em;
@@ -65,8 +66,8 @@
     .title p{
       margin:6px 0 0;
       color:var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
+      font-size:13px;
+      line-height:1.4;
     }
 
     .card{
@@ -86,7 +87,15 @@
     }
 
     label{ display:grid; gap:6px; font-size:13px; color:var(--muted); }
-    input, select, textarea{
+
+    /* Inputs normais (não afeta radio/checkbox) */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    select,
+    textarea{
       width:100%;
       padding:12px;
       background:rgba(255,255,255,.03);
@@ -95,12 +104,25 @@
       border-radius:12px;
       outline:none;
       transition:border .15s ease, box-shadow .15s ease;
-      font-size: 14px;
+      font-size:14px;
     }
+
     textarea{ min-height:100px; resize:vertical; }
+
     input:focus, select:focus, textarea:focus{
       border-color: rgba(124,58,237,.8);
       box-shadow: 0 0 0 4px rgba(124,58,237,.18);
+    }
+
+    /* Radio/Checkbox (corrige mobile) */
+    input[type="radio"],
+    input[type="checkbox"]{
+      width:18px;
+      height:18px;
+      padding:0;
+      margin:0;
+      flex: 0 0 auto;
+      accent-color: var(--accent);
     }
 
     fieldset{
@@ -112,15 +134,46 @@
     legend{ padding:0 8px; color:var(--text); font-weight:700; font-size:14px; }
 
     .options{ display:grid; gap:10px; margin-top:10px; }
+
     .opt{
-      display:flex; gap:10px; align-items:flex-start;
-      padding:10px; border-radius:12px;
+      display:grid;
+      grid-template-columns: 22px 1fr;
+      gap:12px;
+      align-items:flex-start;
+
+      padding:12px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.02);
+
+      min-width: 0;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
     }
-    .opt input{ margin-top:3px; }
-    .opt .t{ color:var(--text); font-size:14px; font-weight:650; }
-    .opt .d{ color:var(--muted); font-size:12px; margin-top:2px; }
+
+    .opt .t{
+      color:var(--text);
+      font-size:14px;
+      font-weight:700;
+      line-height:1.2;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    .opt .d{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+      line-height:1.35;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .opt:has(input:checked){
+      border-color: rgba(124,58,237,.45);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.12);
+      background: rgba(124,58,237,.06);
+    }
 
     .row{
       display:flex;
@@ -136,7 +189,7 @@
       background: linear-gradient(90deg, rgba(124,58,237,1), rgba(59,130,246,1));
       color:white; font-weight:800;
       cursor:pointer;
-      min-height: 44px; /* toque confortável */
+      min-height: 44px;
     }
     .btn.secondary{
       background: rgba(255,255,255,.06);
@@ -144,7 +197,7 @@
       font-weight:650;
     }
     .btn[disabled]{ opacity:.6; cursor:not-allowed; }
-    .help{ color:var(--muted); font-size:12px; line-height: 1.4; }
+    .help{ color:var(--muted); font-size:12px; line-height:1.4; }
 
     .error{ display:none; color:var(--danger); font-size:12px; margin-top:6px; }
     .error.show{ display:block; }
@@ -155,12 +208,13 @@
       border:1px solid var(--border);
       background: rgba(255,255,255,.03);
       font-size:14px;
-      line-height: 1.4;
+      line-height:1.4;
     }
     .status.ok{ border-color: rgba(34,197,94,.35); }
     .status.bad{ border-color: rgba(239,68,68,.35); }
 
     .results{ display:none; gap:14px; }
+
     .cards{
       display:grid; gap:14px;
       grid-template-columns:1fr;
@@ -177,8 +231,11 @@
     }
     .metric .k{ color:var(--muted); font-size:12px; }
     .metric .v{ font-size:22px; font-weight:850; margin-top:6px; }
+
     .badge{
-      display:inline-flex; align-items:center; gap:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
@@ -186,29 +243,34 @@
       background: rgba(255,255,255,.03);
       margin-top:8px;
       color: var(--text);
-      line-height: 1.2;
+      line-height:1.2;
+
+      max-width: 100%;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
     .badge.ok{ border-color: rgba(34,197,94,.35); }
     .badge.warn{ border-color: rgba(245,158,11,.35); }
     .badge.bad{ border-color: rgba(239,68,68,.35); }
 
     .section-title{
-      display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
       margin: 2px 0 10px;
     }
     .section-title h2{ margin:0; font-size:16px; }
     .section-title span{ color:var(--muted); font-size:12px; }
 
     ul{ margin:10px 0 0; padding-left:18px; color:var(--text); }
-    li{ margin:8px 0; color: var(--text); line-height: 1.4; }
+    li{ margin:8px 0; color: var(--text); line-height:1.4; }
     .muted{ color:var(--muted); }
 
-    /* Honeypot */
     .hp{ position:absolute; left:-9999px; top:-9999px; }
 
-    /* ====== CONTEXTO BRASIL (TOPO) ====== */
+    /* ====== CONTEXTO BRASIL ====== */
     .context { margin-bottom: 16px; }
-
     .kpis{
       display:grid; gap:12px;
       grid-template-columns:1fr;
@@ -222,14 +284,13 @@
       border-radius:16px;
       border:1px solid var(--border);
       background: rgba(255,255,255,.03);
+      min-width:0;
     }
     .kpi .k{ color:var(--muted); font-size:12px; }
     .kpi .v{ font-size:18px; font-weight:850; margin-top:6px; }
     .kpi .t{ color:var(--muted); font-size:12px; margin-top:6px; line-height: 1.35; }
 
-    /* ====== TABELAS RESPONSIVAS ======
-       Desktop/tablet: tabela normal.
-       Mobile: vira "cards" por linha (sem scroll horizontal). */
+    /* Tabelas responsivas (mobile vira "cards") */
     .tablewrap{
       border:1px solid var(--border);
       border-radius:14px;
@@ -266,7 +327,6 @@
     }
 
     @media (max-width: 720px){
-      /* Tabela vira cards */
       .tablewrap{ overflow: visible; }
       table, thead, tbody, th, td, tr{ display:block; width:100%; }
       thead{ display:none; }
@@ -282,16 +342,20 @@
         display:flex;
         gap: 10px;
         justify-content: space-between;
+        min-width:0;
+        overflow-wrap:anywhere;
+        word-break:break-word;
       }
       td::before{
         content: attr(data-label);
         color: var(--muted);
         font-weight: 650;
         padding-right: 10px;
+        max-width: 55%;
       }
     }
 
-    /* ===== Float moderno (copyright) ===== */
+    /* ===== Float moderno ===== */
     .floating-copyright{
       position: fixed;
       left: 16px;
@@ -315,7 +379,6 @@
       line-height: 1.2;
       max-width: min(520px, calc(100vw - 32px));
     }
-
     .floating-copyright .dot{
       width: 10px;
       height: 10px;
@@ -324,14 +387,14 @@
       box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
       flex: 0 0 auto;
     }
-    .floating-copyright .text{ display: grid; gap: 2px; }
-    .floating-copyright .text strong{
-      font-weight: 800;
-      color: rgba(255,255,255,0.95);
+    .floating-copyright .text{ display: grid; gap: 2px; min-width:0; }
+    .floating-copyright .text strong{ font-weight: 800; color: rgba(255,255,255,0.95); }
+    .floating-copyright .text span{
+      color: rgba(229,231,235,0.75);
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
-    .floating-copyright .text span{ color: rgba(229,231,235,0.75); }
 
-    /* No mobile, centraliza e deixa mais compacto */
     @media (max-width: 520px){
       .floating-copyright{
         left: 12px;
@@ -343,9 +406,7 @@
         padding: 10px 12px;
         text-align: center;
       }
-      .floating-copyright .text{
-        text-align:center;
-      }
+      .floating-copyright .text{ text-align:center; }
     }
   </style>
 </head>
@@ -355,14 +416,13 @@
     <h1 class="hero-title">Treine por Você: Bem-Estar Começa com uma Escolha</h1>
     <p class="hero-sub">Preencha o formulário e receba indicadores e recomendações personalizadas (orientação geral, não diagnóstico).</p>
 
-    <!-- ===== CONTEXTO BRASIL (INÍCIO DO SITE) ===== -->
+    <!-- ===== CONTEXTO BRASIL ===== -->
     <div class="card context" id="contexto-brasil">
       <div class="section-title">
         <h2>Contexto Brasil — excesso de peso, obesidade e sedentarismo</h2>
         <span class="muted">Dados para referência e comparação</span>
       </div>
 
-      <!-- KPIs (Resumo executivo) -->
       <div class="kpis">
         <div class="kpi">
           <div class="k">Excesso de peso (adultos)</div>
@@ -388,7 +448,6 @@
 
       <hr class="hr" />
 
-      <!-- Tabela 1 -->
       <div class="tablewrap">
         <table>
           <caption>📊 Tabela 1 — Excesso de peso e obesidade por faixa etária (Brasil)</caption>
@@ -440,13 +499,13 @@
           </tbody>
         </table>
       </div>
+
       <div class="note">
         <strong>Leitura-chave:</strong> pico de obesidade entre <strong>45–54 anos</strong>. Jovens têm menor obesidade, mas crescimento rápido.
       </div>
 
       <hr class="hr" />
 
-      <!-- Tabela 2 -->
       <div class="tablewrap">
         <table>
           <caption>🌎 Tabela 2 — Obesidade por região do Brasil (adultos)</caption>
@@ -486,13 +545,13 @@
           </tbody>
         </table>
       </div>
+
       <div class="note">
         <strong>Leitura-chave:</strong> <strong>Sul</strong> e <strong>Sudeste</strong> lideram; <strong>Norte</strong> e <strong>Nordeste</strong> crescem proporcionalmente mais.
       </div>
 
       <hr class="hr" />
 
-      <!-- Tabela 3 -->
       <div class="tablewrap">
         <table>
           <caption>🏃‍♂️ Tabela 3 — Sedentarismo / inatividade física</caption>
@@ -630,17 +689,29 @@
           <div class="options">
             <label class="opt">
               <input type="radio" name="intensity" value="Leve" required />
-              <div><div class="t">Leve</div><div class="d">Caminhada leve, mobilidade, esforço baixo.</div></div>
+              <div>
+                <div class="t">Leve</div>
+                <div class="d">Caminhada leve, mobilidade, esforço baixo.</div>
+              </div>
             </label>
+
             <label class="opt">
               <input type="radio" name="intensity" value="Moderado" />
-              <div><div class="t">Moderado</div><div class="d">Suor leve/moderado, respiração acelerada, ainda conversa.</div></div>
+              <div>
+                <div class="t">Moderado</div>
+                <div class="d">Suor leve/moderado, respiração acelerada, ainda conversa.</div>
+              </div>
             </label>
+
             <label class="opt">
               <input type="radio" name="intensity" value="Intenso" />
-              <div><div class="t">Intenso</div><div class="d">Alta intensidade, difícil manter conversa, esforço elevado.</div></div>
+              <div>
+                <div class="t">Intenso</div>
+                <div class="d">Alta intensidade, difícil manter conversa, esforço elevado.</div>
+              </div>
             </label>
           </div>
+
           <span class="error" data-for="intensity"></span>
         </fieldset>
 
@@ -649,15 +720,26 @@
           <div class="options">
             <label class="opt">
               <input type="checkbox" name="limitations" value="Dor/lesão recente" />
-              <div><div class="t">Dor ou lesão recente</div><div class="d">Ex.: joelho, lombar, ombro.</div></div>
+              <div>
+                <div class="t">Dor ou lesão recente</div>
+                <div class="d">Ex.: joelho, lombar, ombro.</div>
+              </div>
             </label>
+
             <label class="opt">
               <input type="checkbox" name="limitations" value="Condição médica" />
-              <div><div class="t">Condição médica relevante</div><div class="d">Ex.: hipertensão, diabetes, cardiopatias.</div></div>
+              <div>
+                <div class="t">Condição médica relevante</div>
+                <div class="d">Ex.: hipertensão, diabetes, cardiopatias.</div>
+              </div>
             </label>
+
             <label class="opt">
               <input type="checkbox" name="limitations" value="Sedentarismo prolongado" />
-              <div><div class="t">Sedentarismo prolongado</div><div class="d">Mais de 6 meses sem rotina de exercícios.</div></div>
+              <div>
+                <div class="t">Sedentarismo prolongado</div>
+                <div class="d">Mais de 6 meses sem rotina de exercícios.</div>
+              </div>
             </label>
           </div>
 
@@ -739,7 +821,15 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <!-- Float moderno -->
+  <div class="floating-copyright" role="contentinfo" aria-label="Direitos autorais">
+    <div class="dot" aria-hidden="true"></div>
+    <div class="text">
+      <strong>Direitos reservados</strong>
+      <span>a Felipe dos Santos Garcia e Rafael Antunes de Souza</span>
+    </div>
   </div>
 
   <script>
@@ -931,7 +1021,7 @@
     }
 
     function renderReport(out){
-      $("imcVal").textContent = (Math.round(out.imc * 10) / 10).toFixed(1);
+      $("imcVal").textContent = round1(out.imc).toFixed(1);
       setBadge($("imcBadge"), out.imcCat.label, out.imcCat.tone);
 
       $("minsWeekVal").textContent = String(out.minWeek);
@@ -987,6 +1077,7 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    // ✅ SEM salvar no Sheets (somente gera no site)
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -1009,3 +1100,22 @@
         days: Number($("days").value),
         minsPer: Number($("minsPer").value),
         intensity: getRadio("intensity"),
+        limitations: getChecks("limitations"),
+        notes: $("notes").value || ""
+      };
+
+      try {
+        const out = buildRecommendations(input);
+        renderReport(out);
+        setStatus("Relatório gerado com sucesso.", "ok");
+      } catch (err) {
+        console.error(err);
+        setStatus("Falha ao gerar relatório. Verifique os dados e tente novamente.", "bad");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Gerar relatório";
+      }
+    });
+  </script>
+</body>
+</html>
